@@ -54,7 +54,9 @@ ACCOUNT_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME
 export ARM_ACCESS_KEY=$ACCOUNT_KEY
 ``` 
 
-Export your access key to Azure key vault.
+To further protect the Azure Storage Account access key, store your access keys in the previously created Keyvault in previous step. For furher information please visit: https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli#add-a-secret-to-key-vault
+
 ```bash
-export ARM_ACCESS_KEY=$(az keyvault secret show --name terraform-backend-key --vault-name $KEYVAULT_NAME --query value -o tsv)
+az keyvault secret set --vault-name $KEYVAULT_NAME --name "testkey" --value $ACCOUNT_KEY
 ``` 
+Verify that your secrets are stored in your Key vault.
