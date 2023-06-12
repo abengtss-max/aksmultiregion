@@ -18,7 +18,9 @@ Lets create an Azure Keyvault to later store our Access key from storage account
 
 ```bash
 
-az keyvault create --name "myKeyVault" --resource-group $RESOURCE_GROUP_NAME --location "westeurope"
+KEYVAULT_NAME=keyvault_$RANDOM
+
+az keyvault create --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP_NAME --location "westeurope"
 ``` 
 ## 3. Configure Terraform Backend State
 By default, Terraform state is stored locally, which isnt secure or ideal. lets create a storage account were we can securely store states and access it centrally.
@@ -50,5 +52,5 @@ export ARM_ACCESS_KEY=$ACCOUNT_KEY
 
 Export your access key to Azure key vault.
 ```bash
-export ARM_ACCESS_KEY=$(az keyvault secret show --name terraform-backend-key --vault-name myKeyVault --query value -o tsv)
+export ARM_ACCESS_KEY=$(az keyvault secret show --name terraform-backend-key --vault-name $KEYVAULT_NAME --query value -o tsv)
 ``` 
