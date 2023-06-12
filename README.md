@@ -69,3 +69,6 @@ To further protect the Azure Storage Account access key, store your access keys 
 az keyvault secret set --vault-name $KEYVAULT_NAME --name "testkey" --value $ACCOUNT_KEY
 ``` 
 Verify that your secrets are stored in your Key vault.
+
+## 5. Update Terraform Template
+Update the provider.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
