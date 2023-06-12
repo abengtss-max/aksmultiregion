@@ -1,7 +1,7 @@
 #main.tf
 
 data "http" "aksc_release" {
-  url = "https://github.com/abengtss-max/aksmultiregion/Assets/main.json"
+  url = "https://github.com/abengtss-max/aksmultiregion/blob/main/Assets/main.json"
   request_headers = {
     Accept = "application/json"
     User-Agent = "request module"
