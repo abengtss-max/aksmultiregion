@@ -13,7 +13,13 @@ Clone the repository to your local machine
 git clone https://github.com/abengtss-max/aksmultiregion.git
 ```
 
-## 2. Create Azure Keyvalt
+## 2. Create Resource Group
+```bash
+#!/bin/bash
+RESOURCE_GROUP_NAME=tfstate
+``` 
+
+## 3. Create Azure Keyvalt
 Lets create an Azure Keyvault to later store our Access key from storage account. 
 
 ```bash
@@ -22,7 +28,7 @@ KEYVAULT_NAME=keyvault$RANDOM
 
 az keyvault create --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP_NAME --location "westeurope"
 ``` 
-## 3. Configure Terraform Backend State
+## 4. Configure Terraform Backend State
 By default, Terraform state is stored locally, which isnt secure or ideal. lets create a storage account were we can securely store states and access it centrally.
 
 Create storage account.
@@ -30,7 +36,6 @@ Create storage account.
 ```bash
 #!/bin/bash
 
-RESOURCE_GROUP_NAME=tfstate
 STORAGE_ACCOUNT_NAME=tfstate$RANDOM
 CONTAINER_NAME=tfstate
 
