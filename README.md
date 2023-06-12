@@ -6,6 +6,15 @@ By default, AKS provides high availability by using multiple nodes in a Virtual 
 
 # Tutorial
 
+## Prerequisites
+Recommendation: use Azure Cloud Shell. 
+
+If you prefer to use your local environment the following tools are needed to conduct the tutorial:
+- Azure CLI.
+- Git.
+- kubectl client.
+- Terraform binary.
+
 ## 1. Clone Repository
 Clone the repository to your local machine
 
