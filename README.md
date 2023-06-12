@@ -6,7 +6,7 @@ By default, AKS provides high availability by using multiple nodes in a Virtual 
 
 # Tutorial
 
-## 1. Clone repository
+## 1. Clone Repository
 Clone the repository to your local machine
 
 ```git
