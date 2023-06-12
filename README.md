@@ -18,7 +18,7 @@ Lets create an Azure Keyvault to later store our Access key from storage account
 
 ```bash
 
-KEYVAULT_NAME=keyvault_$RANDOM
+KEYVAULT_NAME=keyvault$RANDOM
 
 az keyvault create --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP_NAME --location "westeurope"
 ``` 
