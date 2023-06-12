@@ -30,7 +30,7 @@ RESOURCE_GROUP_NAME=tfstate
 az group create --name $RESOURCE_GROUP_NAME --location westeurope
 ``` 
 
-### Note: In cloud shell, sessions will time out after some time. This means that environment variables will disappear. To work around this, you can save your variables to a file, and then restore them, using the following commands:
+#### Note: In cloud shell, sessions will time out after some time. This means that environment variables will disappear. To work around this, you can save your variables to a file, and then restore them, using the following commands:
 
 ```bash
 # Save envirnment variables
