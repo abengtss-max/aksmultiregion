@@ -73,7 +73,7 @@ Verify that your secrets are stored in your Key vault.
 ## 5. Update Terraform Template
 Update the provider.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
 
-## 6. Deploy infrastructure with Terraform
+## 6. Deploy Infrastructure with Terraform
 
 Initialize Terraform providers and backend.
 
