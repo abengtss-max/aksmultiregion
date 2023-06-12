@@ -20,7 +20,7 @@ Lets create an Azure Keyvault to later store our Access key from storage account
 
 az keyvault create --name "myKeyVault" --resource-group $RESOURCE_GROUP_NAME --location "westeurope"
 ``` 
-## 2. Configure Terraform Backend State
+## 3. Configure Terraform Backend State
 By default, Terraform state is stored locally, which isnt secure or ideal. lets create a storage account were we can securely store states and access it centrally.
 
 Create storage account.
