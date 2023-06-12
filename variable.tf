@@ -6,7 +6,7 @@ variable resourceGroupName {
 }
 variable location {
   type=string
-  default="WestEurope"
+  default="swedencentral"
 } 
 variable resourceName {
   type=string
