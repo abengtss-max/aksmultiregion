@@ -17,9 +17,11 @@ git clone https://github.com/abengtss-max/aksmultiregion.git
 ```bash
 #!/bin/bash
 RESOURCE_GROUP_NAME=tfstate
+
+az group create --name $RESOURCE_GROUP_NAME --location westeurope
 ``` 
 
-## 3. Create Azure Keyvalt
+## 3. Create Azure Keyvault
 Lets create an Azure Keyvault to later store our Access key from storage account. 
 
 ```bash
@@ -38,9 +40,6 @@ Create storage account.
 
 STORAGE_ACCOUNT_NAME=tfstate$RANDOM
 CONTAINER_NAME=tfstate
-
-# Create resource group
-az group create --name $RESOURCE_GROUP_NAME --location westeurope
 
 # Create storage account
 az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
