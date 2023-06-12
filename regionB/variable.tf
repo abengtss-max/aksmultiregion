@@ -2,15 +2,15 @@
 
 variable resourceGroupName {
   type=string
-  default="az-k8s-68lg-rg"
+  default="az-k8s-regionB-rg"
 }
 variable location {
   type=string
-  default="swedencentral"
+  default="eastus"
 } 
 variable resourceName {
   type=string
-  default="az-k8s-68lg"
+  default="az-k8s-regionB"
 } 
 variable agentCount {
   type=number
