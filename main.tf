@@ -1,7 +1,7 @@
 #main.tf
 
 data "http" "aksc_release" {
-  url = "https://github.com/Azure/AKS-Construction/releases/download/0.9.15/main.json"
+  url = "https://github.com/abengtss-max/aksmultiregion/Assets/main.json"
   request_headers = {
     Accept = "application/json"
     User-Agent = "request module"
