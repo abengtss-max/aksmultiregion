@@ -28,8 +28,8 @@ resource "azurerm_resource_group_template_deployment" "aksc_deploy" {
     agentCountMax = {value=var.agentCountMax}
     custom_vnet = {value=var.custom_vnet}
     CreateNetworkSecurityGroups = {value=var.CreateNetworkSecurityGroups}
-    registries_sku = {value=var.registries_sku}
-    acrPushRolePrincipalId = {value=data.azurerm_client_config.current.object_id}
+   # registries_sku = {value=var.registries_sku}
+   # acrPushRolePrincipalId = {value=data.azurerm_client_config.current.object_id}
     azureFirewalls = {value=var.azureFirewalls}
     azureFirewallSku = {value=var.azureFirewallSku}
     privateLinks = {value=var.privateLinks}
@@ -39,8 +39,8 @@ resource "azurerm_resource_group_template_deployment" "aksc_deploy" {
     enablePrivateCluster = {value=var.enablePrivateCluster}
     fileCSIDriver = {value=var.fileCSIDriver}
     diskCSIDriver = {value=var.diskCSIDriver}
-    acrUntaggedRetentionPolicyEnabled = {value=var.acrUntaggedRetentionPolicyEnabled}
-    acrUntaggedRetentionPolicy = {value=var.acrUntaggedRetentionPolicy}
+    #acrUntaggedRetentionPolicyEnabled = {value=var.acrUntaggedRetentionPolicyEnabled}
+    #acrUntaggedRetentionPolicy = {value=var.acrUntaggedRetentionPolicy}
     oidcIssuer = {value=var.oidcIssuer}
     workloadIdentity = {value=var.workloadIdentity}
   })

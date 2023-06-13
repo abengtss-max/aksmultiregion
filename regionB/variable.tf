@@ -6,7 +6,7 @@ variable resourceGroupName {
 }
 variable location {
   type=string
-  default="eastus"
+  default="northeurope"
 } 
 variable resourceName {
   type=string
@@ -42,7 +42,7 @@ variable registries_sku {
 } 
 variable azureFirewalls {
   type=bool
-  default=true
+  default=false
 } 
 variable azureFirewallSku {
   type=string

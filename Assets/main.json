@@ -148,7 +148,7 @@
     },
     "bastion": {
       "type": "bool",
-      "defaultValue": true,
+      "defaultValue": false,
       "metadata": {
         "description": "Deploy Azure Bastion to your vnet. (works with Custom Networking only, not BYO)"
       }
