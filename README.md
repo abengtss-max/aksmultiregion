@@ -83,7 +83,7 @@ az keyvault secret set --vault-name $KEYVAULT_NAME --name "testkey" --value $ACC
 Verify that your secrets are stored in your Key vault.
 
 ## 5. Update Terraform Template
-Update the provider.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
+Update the main.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
 
 ## 6. Deploy Infrastructure with Terraform
 
