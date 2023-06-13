@@ -83,7 +83,7 @@ az keyvault secret set --vault-name $KEYVAULT_NAME --name "testkey" --value $ACC
 Verify that your secrets are stored in your Key vault.
 
 ## 5. Update Terraform Template
-Update the main.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
+Update the provider.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
 
 ## 6. Deploy Infrastructure with Terraform
 
@@ -105,3 +105,48 @@ terraform apply
 terraform output
 ```
 
+## 7. Build and Push application to Azure Container Registry
+Ensure you are in the right directory when you are executing the following command. The command 
+Builds, tags and pushes to image to a container registry called **crazk8sregionAlpu27lwe7jpr2**
+
+```bash 
+az acr build --registry crazk8sregionAlpu27lwe7jpr2 --image myapp:v1 .
+```
+## 8. Deploy the Application to RegionA AKS Private Cluster
+
+As the AKS cluster is private, we need to deploy application either by means of jumphost which is residing in the same vnet or an adjecent vnet which is peered to AKS cluster vnets. In this exercise we will use az aks command invoke which allows administrators to operate securely with AKS without the need of using a jumphost. more information about az aks command invoke can be found here: https://learn.microsoft.com/en-us/azure/aks/command-invoke
+
+
+```bash 
+az aks command invoke   --resource-group az-k8s-regionA-rg   --name aks-az-k8s-regionA  --command "kubectl run app --image crazk8sregionalpu27lwe7jpr2.azurecr.io/myapp:v1"
+```
+
+## 9. ACR Integration with RegionB AKS Private Cluster
+
+Integrate regionB AKS cluster with ACR, note that during the deployment of AKS regionA, a managed identity is already associated to ACR with role AcrPull. This will allow RegionB AKS Cluster to successfully retrieve images onto the Cluster.
+
+```bash 
+az aks update -n aks-az-k8s-regionB -g az-k8s-regionB-rg --attach-acr crazk8sregionAlpu27lwe7jpr2
+```
+
+## 10. Deploy the Application to RegionB AKS Private Cluster
+
+Deploy the app to RegionB AKS Private Cluster. **Note how long time it takes to deploy the Pod onto the cluster, in comparison to RegionA AKS Cluster** You may encounter that it takes a longer time for the Pod to be in **running state**. This is due to the ACR is currently residing in **swedencentral** and RegionB AKS cluster is situated in **eastus**.
+
+```bash 
+az aks command invoke   --resource-group az-k8s-regionB-rg   --name aks-az-k8s-regionB   --command "kubectl run app --image crazk8sregionalpu27lwe7jpr2.azurecr.io/myapp:v1"
+```
+## 11.  Enable ACR Geo-Replication
+Inorder to reduce the latency, and providing a single point of ACR endpoint for pulling images between different regions, we can enable ACR Geo-Replication. 
+
+Enable Geo-Replication and add eastus as the replication region.
+
+![Screenshot](georep.jpg)
+
+## 12. Deploy the Application to RegionB AKS Private Cluster Again.
+
+Delete the existing running pod in RegionB AKS cluster and redeploy again, note the time difference.
+
+```bash 
+az aks command invoke   --resource-group az-k8s-regionB-rg   --name aks-az-k8s-regionB   --command "kubectl run app --image crazk8sregionalpu27lwe7jpr2.azurecr.io/myapp:v1"
+```
