@@ -131,7 +131,42 @@ As the AKS cluster is private, we need to deploy application either by means of 
 
 
 ```bash 
-az aks command invoke   --resource-group az-k8s-regionA-rg   --name aks-az-k8s-regionA  --command "kubectl run app --image crazk8sregionalpu27lwe7jpr2.azurecr.io/myapp:v1"
+az aks command invoke   --resource-group az-k8s-region-a-rg   --name aks-az-k8s-region-a   --command 'kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latency-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: latency-test
+  template:
+    metadata:
+      labels:
+        app: latency-test
+    spec:
+      containers:
+      - name: latency-test
+        image: crazk8sregiona3puht23u7vmqg.azurecr.io/myapp:v1
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: latency-test
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  selector:
+    app: latency-test
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+EOF'
 ```
 
 ## 9. ACR Integration with RegionB AKS Private Cluster
@@ -147,7 +182,42 @@ az aks update -n aks-az-k8s-regionB -g az-k8s-regionB-rg --attach-acr crazk8sreg
 Deploy the app to RegionB AKS Private Cluster. **Note how long time it takes to deploy the Pod onto the cluster, in comparison to RegionA AKS Cluster** You may encounter that it takes a longer time for the Pod to be in **running state**. This is due to the ACR is currently residing in **swedencentral** and RegionB AKS cluster is situated in **eastus**.
 
 ```bash 
-az aks command invoke   --resource-group az-k8s-regionB-rg   --name aks-az-k8s-regionB   --command "kubectl run app --image crazk8sregionalpu27lwe7jpr2.azurecr.io/myapp:v1"
+az aks command invoke   --resource-group az-k8s-region-b-rg   --name aks-az-k8s-region-b   --command 'kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latency-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: latency-test
+  template:
+    metadata:
+      labels:
+        app: latency-test
+    spec:
+      containers:
+      - name: latency-test
+        image: crazk8sregiona3puht23u7vmqg.azurecr.io/myapp:v1
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: latency-test
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  selector:
+    app: latency-test
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+EOF'
 ```
 
 ## 11.  Enable ACR Geo-Replication
