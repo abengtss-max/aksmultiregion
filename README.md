@@ -108,7 +108,14 @@ terraform apply plan
 terraform output
 ```
 
-## 7. Build and Push application to Azure Container Registry
+## 7.  Enable ACR Geo-Replication
+Inorder to reduce the latency, and providing a single point of ACR endpoint for pulling images between different regions, we can enable ACR Geo-Replication. 
+
+Enable Geo-Replication and add eastus as the replication region.
+
+![Screenshot](georep.jpg)
+
+## 8. Build and Push application to Azure Container Registry
 
 #### Note: For simplicity we will temporarily open up the Container Registry for public access. This is so that we can continue to use cloud shell, instead of installing all the needed tools on a VM inside the VNET.
 
@@ -125,7 +132,7 @@ az acr build --registry crazk8sregionAlpu27lwe7jpr2 --image myapp:v1 .
 
 After the container build and push has finished, you can disable public access on the container registry again.
 
-## 8. Deploy the Application to RegionA AKS Private Cluster
+## 9. Deploy the Application to RegionA AKS Private Cluster
 
 As the AKS cluster is private, we need to deploy application either by means of jumphost which is residing in the same vnet or an adjecent vnet which is peered to AKS cluster vnets. In this exercise we will use az aks command invoke which allows administrators to operate securely with AKS without the need of using a jumphost. More information about az aks command invoke can be found here: https://learn.microsoft.com/en-us/azure/aks/command-invoke
 
@@ -169,7 +176,7 @@ spec:
 EOF'
 ```
 
-## 9. ACR Integration with RegionB AKS Private Cluster
+## 10. ACR Integration with RegionB AKS Private Cluster
 
 Integrate regionB AKS cluster with ACR, note that during the deployment of AKS regionA, a managed identity is already associated to ACR with role AcrPull. This will allow RegionB AKS Cluster to successfully retrieve images onto the Cluster.
 
@@ -177,7 +184,7 @@ Integrate regionB AKS cluster with ACR, note that during the deployment of AKS r
 az aks update -n aks-az-k8s-regionB -g az-k8s-regionB-rg --attach-acr crazk8sregionAlpu27lwe7jpr2
 ```
 
-## 10. Deploy the Application to RegionB AKS Private Cluster
+## 11. Deploy the Application to RegionB AKS Private Cluster
 
 Deploy the app to RegionB AKS Private Cluster. **Note how long time it takes to deploy the Pod onto the cluster, in comparison to RegionA AKS Cluster** You may encounter that it takes a longer time for the Pod to be in **running state**. This is due to the ACR is currently residing in **swedencentral** and RegionB AKS cluster is situated in **eastus**.
 
@@ -220,12 +227,6 @@ spec:
 EOF'
 ```
 
-## 11.  Enable ACR Geo-Replication
-Inorder to reduce the latency, and providing a single point of ACR endpoint for pulling images between different regions, we can enable ACR Geo-Replication. 
-
-Enable Geo-Replication and add eastus as the replication region.
-
-![Screenshot](georep.jpg)
 
 ## 12. Deploy the Application to RegionB AKS Private Cluster Again.
 
