@@ -27,7 +27,7 @@ git clone https://github.com/abengtss-max/aksmultiregion.git
 #!/bin/bash
 RESOURCE_GROUP_NAME=tfstate
 
-az group create --name $RESOURCE_GROUP_NAME --location westeurope
+az group create --name $RESOURCE_GROUP_NAME --location swedencentral
 ``` 
 
 #### Note: In cloud shell, sessions will time out after some time. This means that environment variables will be lost. To work around this, you can save your variables to a file, and then restore them, using the following commands:
@@ -42,12 +42,12 @@ source env_vars.txt
 ```
 
 
-## 3. Create Azure Keyvault
-Lets create an Azure Keyvault for storing our Access key for the storage account that will be created in a later step. 
+## 3. Create Azure KeyVault
+Lets create an Azure KeyVault for storing our Access key for the storage account that will be created in a later step. 
 
 ```bash
 KEYVAULT_NAME=keyvault$RANDOM
-az keyvault create --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP_NAME --location "westeurope"
+az keyvault create --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP_NAME --location "swedencentral"
 ``` 
 
 ## 4. Configure Terraform Backend State
@@ -74,7 +74,7 @@ ACCOUNT_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME
 export ARM_ACCESS_KEY=$ACCOUNT_KEY
 ``` 
 
-To further protect the storage account access key, store your access keys in the previously created Keyvault. For furher information please visit: https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli#add-a-secret-to-key-vault
+To further protect the storage account access key, store your access keys in the previously created KeyVault. For furher information please visit: https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli#add-a-secret-to-key-vault
 
 ```bash
 az keyvault secret set --vault-name $KEYVAULT_NAME --name "testkey" --value $ACCOUNT_KEY
@@ -83,7 +83,7 @@ Verify that your secrets are stored in your Key vault.
 
 ## 5. Update Terraform Template
 
-Update the provider.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
+Update the main.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
 
 ## 6. Deploy Infrastructure with Terraform
 
@@ -103,8 +103,8 @@ terraform validate
 Deploy the configuration.
 
 ```bash 
-terraform plan 
-terraform apply
+terraform plan -out plan
+terraform apply plan
 terraform output
 ```
 
