@@ -127,6 +127,7 @@ Ensure you are in the right directory when you are executing the following comma
 The command below builds, tags and pushes to image to a container registry called **crazk8sregionAlpu27lwe7jpr2**. Make sure to change to the container registry created (by the terraform script) in your subscription.
 
 ```bash 
+cd aksmultiregion/app/
 az acr build --registry crazk8sregionAlpu27lwe7jpr2 --image myapp:v1 .
 ```
 
@@ -134,8 +135,13 @@ After the container build and push has finished, you can disable public access o
 
 ## 9. Deploy the Application to RegionA AKS Private Cluster
 
-As the AKS cluster is private, we need to deploy application either by means of jumphost which is residing in the same vnet or an adjecent vnet which is peered to AKS cluster vnets. In this exercise we will use az aks command invoke which allows administrators to operate securely with AKS without the need of using a jumphost. More information about az aks command invoke can be found here: https://learn.microsoft.com/en-us/azure/aks/command-invoke
+As the AKS cluster is private, we need to deploy application either by means of jumphost which is residing in the same vnet or an adjecent vnet which is peered to AKS cluster vnet. In this exercise we will use az aks command invoke which allows administrators to operate securely with AKS without the need of using a jumphost. More information about az aks command invoke can be found here: https://learn.microsoft.com/en-us/azure/aks/command-invoke
 
+The following script will create the following:
+
+- Deployment object called latency-test with one replica.
+- Service object which initiates an internal load balancer (Dynamic private IP) called **kubernetes-internal**
+- Service object which creates a private link for the load balancer, which will be used by azure front door as a private origin.
 
 ```bash 
 az aks command invoke   --resource-group az-k8s-region-a-rg   --name aks-az-k8s-region-a   --command 'kubectl apply -f - <<EOF
@@ -165,6 +171,9 @@ metadata:
   name: latency-test
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-pls-name: "lbPrivateLinkRegionA"
+    service.beta.kubernetes.io/azure-pls-create: "true"
+    service.beta.kubernetes.io/azure-pls-visibility: "*"
 spec:
   type: LoadBalancer
   selector:
@@ -175,21 +184,29 @@ spec:
     targetPort: 8080
 EOF'
 ```
+Verify :
+- That your internal kubernetes load balancer is created, its available in your **Nodegroup** and called **kubernetes-internal**
+- Verify that your private link is created you should be able to see it in **Azure private link services**
+- Take note of your internal load balancers **External-IP** (its private)
+
+```bash
+az aks command invoke   --resource-group az-k8s-region-a-rg   --name aks-az-k8s-region-a   --command 'kubectl get svc'
+```
 
 ## 10. ACR Integration with RegionB AKS Private Cluster
 
 Integrate regionB AKS cluster with ACR, note that during the deployment of AKS regionA, a managed identity is already associated to ACR with role AcrPull. This will allow RegionB AKS Cluster to successfully retrieve images onto the Cluster.
 
 ```bash 
-az aks update -n aks-az-k8s-regionB -g az-k8s-regionB-rg --attach-acr crazk8sregionAlpu27lwe7jpr2
+az aks update -n aks-az-k8s-region-b -g az-k8s-region-b-rg --attach-acr crazk8sregionAlpu27lwe7jpr2
 ```
 
 ## 11. Deploy the Application to RegionB AKS Private Cluster
 
-Deploy the app to RegionB AKS Private Cluster. **Note how long time it takes to deploy the Pod onto the cluster, in comparison to RegionA AKS Cluster** You may encounter that it takes a longer time for the Pod to be in **running state**. This is due to the ACR is currently residing in **swedencentral** and RegionB AKS cluster is situated in **eastus**.
+Deploy the app to RegionB AKS Private Cluster.
 
 ```bash 
-az aks command invoke   --resource-group az-k8s-region-b-rg   --name aks-az-k8s-region-b   --command 'kubectl apply -f - <<EOF
+az aks command invoke   --resource-group az-k8s-region-a-rg   --name aks-az-k8s-region-a   --command 'kubectl apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -216,6 +233,9 @@ metadata:
   name: latency-test
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-pls-name: "lbPrivateLinkRegionB"
+    service.beta.kubernetes.io/azure-pls-create: "true"
+    service.beta.kubernetes.io/azure-pls-visibility: "*"
 spec:
   type: LoadBalancer
   selector:
@@ -227,10 +247,47 @@ spec:
 EOF'
 ```
 
+Verify :
+- That your internal kubernetes load balancer is created, its available in your **Nodegroup** and called **kubernetes-internal**
+- Verify that your private link is created you should be able to see it in **Azure private link services**
+- Take note of your internal load balancers **External-IP** (its private)
 
-## 12. Deploy the Application to RegionB AKS Private Cluster Again.
+```bash
+az aks command invoke   --resource-group az-k8s-region-b-rg   --name aks-az-k8s-region-b   --command 'kubectl get svc'
+```
 
-Delete the existing running pod in RegionB AKS cluster and redeploy again, note the time difference.
+## 12. Create an Azure Frontdoor 
+
+In this section we are going to focus on creating an Azure FrontDoor which connects to an internal load balancer origin with Private Link.
+
+1) In the Azure portal search field, search for Front Door and select **Front door and CDN Profiles**.
+
+![Screenshot](azfd1.jpg)
+
+2) Press **Create**
+![Screenshot](azfd2.jpg)
+
+3) Press **Continue to create a Front Door**
+
+4) In create a Front Door profile section. Create a new **resource group**, provide a **name** for the profile. Origin type must be set to **Custom**. Add your internal load balancer IP in the **origin hostname**. Ensure you check the box **Enable private links** and continue to complete the required sections as depicted below, once completed Press **Review and Create** to complete the deployment.
+![Screenshot](azfd3.jpg)
+
+5) In the private link center **approve** the connection.
+![Screenshot](azfd4.jpg)
+
+6) Add an additional origin, we need to add AKS cluster in region B to Front Door, once completed go back to Azure Private Link center and approve the connection for **lbPrivateLinkRegionB**
+![Screenshot](azfd5.jpg)
+
+7) Update your origin-group with a new health probe Path, add **/index.html** the container will respond with a HTTP 200 to inform Azure Front that the private origin is alive. 
+![Screenshot](azfd5.jpg)
+
+8) Update your origin-group with a new health probe Path, add **/index.html** the container will respond with a HTTP 200 to inform Azure Front that the private origin is alive. 
+![Screenshot](azfd6.jpg)
+
+9) Update the default route to use HTTP. Ensure **"Redirect all traffic to use HTTPS"** is unthicked, set **Forwarding protocol** to **HTTP only**
+![Screenshot](azfd7.jpg)
+
+10) Access Azure Front Door's endpoint and you should now be able to access the web application through your browser.
 
 ```bash 
 az aks command invoke   --resource-group az-k8s-regionB-rg   --name aks-az-k8s-regionB   --command "kubectl run app --image crazk8sregionalpu27lwe7jpr2.azurecr.io/myapp:v1"
