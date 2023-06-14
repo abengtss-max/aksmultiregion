@@ -2,7 +2,7 @@
 
 variable resourceGroupName {
   type=string
-  default="az-k8s-regionA-rg"
+  default="az-k8s-region-a-rg"
 }
 variable location {
   type=string
@@ -10,7 +10,7 @@ variable location {
 } 
 variable resourceName {
   type=string
-  default="az-k8s-regionA"
+  default="az-k8s-region-a"
 } 
 variable agentCount {
   type=number
@@ -36,6 +36,10 @@ variable CreateNetworkSecurityGroups {
   type=bool
   default=true
 } 
+variable bastion {
+  type=bool
+  default=false
+} 
 variable registries_sku {
   type=string
   default="Premium"
@@ -52,14 +56,6 @@ variable privateLinks {
   type=bool
   default=true
 } 
-variable omsagent {
-  type=bool
-  default=true
-} 
-variable retentionInDays {
-  type=number
-  default=30
-} 
 variable availabilityZones {
   default=["1","2","3"]
 } 
@@ -67,13 +63,33 @@ variable enablePrivateCluster {
   type=bool
   default=true
 } 
-variable fileCSIDriver {
+variable ingressApplicationGateway {
   type=bool
   default=false
 } 
-variable diskCSIDriver {
+variable appGWcount {
+  type=number
+  default=0
+} 
+variable appGWsku {
+  type=string
+  default="WAF_v2"
+} 
+variable appGWmaxCount {
+  type=number
+  default=10
+} 
+variable privateIpApplicationGateway {
+  type=string
+  default="10.240.5.200"
+} 
+variable keyVaultAksCSI {
   type=bool
-  default=false
+  default=true
+} 
+variable keyVaultCreate {
+  type=bool
+  default=true
 } 
 variable acrUntaggedRetentionPolicyEnabled {
   type=bool
@@ -81,7 +97,11 @@ variable acrUntaggedRetentionPolicyEnabled {
 } 
 variable acrUntaggedRetentionPolicy {
   type=number
-  default=15
+  default=5
+} 
+variable blobCSIDriver {
+  type=bool
+  default=true
 } 
 variable oidcIssuer {
   type=bool

@@ -10,7 +10,7 @@ terraform {
   }
   backend "azurerm" {
       resource_group_name  = "tfstate"
-      storage_account_name = "<STORAGE_ACCOUNT_NAME>"
+      storage_account_name = "tfstate18500"
       container_name       = "tfstate"
       key                  = "terraform.tfstate"
   }
@@ -28,9 +28,4 @@ module "regionB" {
 
 provider "azurerm" {
   features {}
-}
-
-resource "azurerm_resource_group" "state-demo-secure" {
-  name     = "state-demo"
-  location = "swedencentral"
 }

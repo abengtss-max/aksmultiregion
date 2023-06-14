@@ -28,19 +28,25 @@ resource "azurerm_resource_group_template_deployment" "aksc_deploy" {
     agentCountMax = {value=var.agentCountMax}
     custom_vnet = {value=var.custom_vnet}
     CreateNetworkSecurityGroups = {value=var.CreateNetworkSecurityGroups}
+    bastion = {value=var.bastion}
     registries_sku = {value=var.registries_sku}
     acrPushRolePrincipalId = {value=data.azurerm_client_config.current.object_id}
     azureFirewalls = {value=var.azureFirewalls}
     azureFirewallSku = {value=var.azureFirewallSku}
     privateLinks = {value=var.privateLinks}
-    omsagent = {value=var.omsagent}
-    retentionInDays = {value=var.retentionInDays}
     availabilityZones = {value=var.availabilityZones}
     enablePrivateCluster = {value=var.enablePrivateCluster}
-    fileCSIDriver = {value=var.fileCSIDriver}
-    diskCSIDriver = {value=var.diskCSIDriver}
+    ingressApplicationGateway = {value=var.ingressApplicationGateway}
+    appGWcount = {value=var.appGWcount}
+    appGWsku = {value=var.appGWsku}
+    appGWmaxCount = {value=var.appGWmaxCount}
+    privateIpApplicationGateway = {value=var.privateIpApplicationGateway}
+    keyVaultAksCSI = {value=var.keyVaultAksCSI}
+    keyVaultCreate = {value=var.keyVaultCreate}
+    keyVaultOfficerRolePrincipalId = {value=data.azurerm_client_config.current.object_id}
     acrUntaggedRetentionPolicyEnabled = {value=var.acrUntaggedRetentionPolicyEnabled}
     acrUntaggedRetentionPolicy = {value=var.acrUntaggedRetentionPolicy}
+    blobCSIDriver = {value=var.blobCSIDriver}
     oidcIssuer = {value=var.oidcIssuer}
     workloadIdentity = {value=var.workloadIdentity}
   })

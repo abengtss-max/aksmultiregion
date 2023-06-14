@@ -1,22 +1,22 @@
 # AKS Multi-Region
-The code base contains a sample solution for establishing a high available AKS cluster in Azure, by using AKS in multiple region and diverting the traffic by usage of Azure front door.
+The code base in this repository contains a sample solution for establishing a high available AKS cluster in Azure, by using AKS in multiple regions and by directing the traffic with Azure Frontdoor.
 
 ## Introduction
-By default, AKS provides high availability by using multiple nodes in a Virtual Machine Scale Set (VMSS). But these multiple nodes don’t protect your system from a region failure. This tutorial concentrates on how to achieve a higher business continuity with AKS.
+By default, AKS provides high availability by using multiple nodes in a Virtual Machine Scale Set (VMSS) that can be distributed across multiple availability zones.  This does not protect agains a region failure however. This tutorial concentrates on how to achieve a higher business continuity with AKS.
 
 # Tutorial
 
 ## Prerequisites
-Recommendation: use Azure Cloud Shell. 
+#### Recommendation: Use Azure Cloud Shell, as your bash shell. Cloud shell comes pre installed with all the tools needed for this workshop 
 
-If you prefer to use your local environment the following tools are needed to conduct the tutorial:
+If you prefer to use your local environment the following tools are needed:
 - Azure CLI.
 - Git.
 - kubectl client.
 - Terraform binary.
 
 ## 1. Clone Repository
-Clone the repository to your local machine
+Clone the repository to cloud shell (or to your local machine - see above)
 
 ```git
 git clone https://github.com/abengtss-max/aksmultiregion.git
@@ -30,7 +30,7 @@ RESOURCE_GROUP_NAME=tfstate
 az group create --name $RESOURCE_GROUP_NAME --location westeurope
 ``` 
 
-#### Note: In cloud shell, sessions will time out after some time. This means that environment variables will disappear. To work around this, you can save your variables to a file, and then restore them, using the following commands:
+#### Note: In cloud shell, sessions will time out after some time. This means that environment variables will be lost. To work around this, you can save your variables to a file, and then restore them, using the following commands:
 
 ```bash
 # Save envirnment variables
@@ -43,16 +43,15 @@ source env_vars.txt
 
 
 ## 3. Create Azure Keyvault
-Lets create an Azure Keyvault to later store our Access key from storage account. 
+Lets create an Azure Keyvault for storing our Access key for the storage account that will be created in a later step. 
 
 ```bash
-
 KEYVAULT_NAME=keyvault$RANDOM
-
 az keyvault create --name $KEYVAULT_NAME --resource-group $RESOURCE_GROUP_NAME --location "westeurope"
 ``` 
+
 ## 4. Configure Terraform Backend State
-By default, Terraform state is stored locally, which isnt secure or ideal. lets create a storage account were we can securely store states and access it centrally.
+By default, Terraform state is stored locally, which is not secure or ideal. Instead create a storage account to securely store states and access it centrally.
 
 Create storage account.
 
@@ -75,7 +74,7 @@ ACCOUNT_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME
 export ARM_ACCESS_KEY=$ACCOUNT_KEY
 ``` 
 
-To further protect the Azure Storage Account access key, store your access keys in the previously created Keyvault in previous step. For furher information please visit: https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli#add-a-secret-to-key-vault
+To further protect the storage account access key, store your access keys in the previously created Keyvault. For furher information please visit: https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli#add-a-secret-to-key-vault
 
 ```bash
 az keyvault secret set --vault-name $KEYVAULT_NAME --name "testkey" --value $ACCOUNT_KEY
@@ -83,15 +82,19 @@ az keyvault secret set --vault-name $KEYVAULT_NAME --name "testkey" --value $ACC
 Verify that your secrets are stored in your Key vault.
 
 ## 5. Update Terraform Template
+
 Update the provider.tf file with the correct storage account name ($STORAGE_ACCOUNT_NAME).
 
 ## 6. Deploy Infrastructure with Terraform
+
+#### Note: Before doing this step, feel free to take the time to study the terraform template, and the underlying ARM-template (in Assets folder).
 
 Initialize Terraform providers and backend.
 
 ```bash
 terraform init
 ``` 
+
 Validate the Terraform configuration.
 
 ```bash
@@ -106,15 +109,25 @@ terraform output
 ```
 
 ## 7. Build and Push application to Azure Container Registry
-Ensure you are in the right directory when you are executing the following command. The command 
-Builds, tags and pushes to image to a container registry called **crazk8sregionAlpu27lwe7jpr2**
+
+#### Note: For simplicity we will temporarily open up the Container Registry for public access. This is so that we can continue to use cloud shell, instead of installing all the needed tools on a VM inside the VNET.
+
+![Screenshot](public-acr.jpg)
+
+
+Ensure you are in the right directory when you are executing the following command. You should be in the "app" folder.
+
+The command below builds, tags and pushes to image to a container registry called **crazk8sregionAlpu27lwe7jpr2**. Make sure to change to the container registry created (by the terraform script) in your subscription.
 
 ```bash 
 az acr build --registry crazk8sregionAlpu27lwe7jpr2 --image myapp:v1 .
 ```
+
+After the container build and push has finished, you can disable public access on the container registry again.
+
 ## 8. Deploy the Application to RegionA AKS Private Cluster
 
-As the AKS cluster is private, we need to deploy application either by means of jumphost which is residing in the same vnet or an adjecent vnet which is peered to AKS cluster vnets. In this exercise we will use az aks command invoke which allows administrators to operate securely with AKS without the need of using a jumphost. more information about az aks command invoke can be found here: https://learn.microsoft.com/en-us/azure/aks/command-invoke
+As the AKS cluster is private, we need to deploy application either by means of jumphost which is residing in the same vnet or an adjecent vnet which is peered to AKS cluster vnets. In this exercise we will use az aks command invoke which allows administrators to operate securely with AKS without the need of using a jumphost. More information about az aks command invoke can be found here: https://learn.microsoft.com/en-us/azure/aks/command-invoke
 
 
 ```bash 
@@ -136,6 +149,7 @@ Deploy the app to RegionB AKS Private Cluster. **Note how long time it takes to 
 ```bash 
 az aks command invoke   --resource-group az-k8s-regionB-rg   --name aks-az-k8s-regionB   --command "kubectl run app --image crazk8sregionalpu27lwe7jpr2.azurecr.io/myapp:v1"
 ```
+
 ## 11.  Enable ACR Geo-Replication
 Inorder to reduce the latency, and providing a single point of ACR endpoint for pulling images between different regions, we can enable ACR Geo-Replication. 
 
