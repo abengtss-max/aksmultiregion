@@ -209,7 +209,7 @@ az aks update -n aks-az-k8s-region-b -g az-k8s-region-b-rg --attach-acr crazk8sr
 Deploy the app to RegionB AKS Private Cluster.
 
 ```bash 
-az aks command invoke   --resource-group az-k8s-region-a-rg   --name aks-az-k8s-region-a   --command 'kubectl apply -f - <<EOF
+az aks command invoke   --resource-group az-k8s-region-b-rg   --name aks-az-k8s-region-b   --command 'kubectl apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
