@@ -164,6 +164,9 @@ spec:
         image: crazk8sregiona3puht23u7vmqg.azurecr.io/myapp:v1
         ports:
         - containerPort: 8080
+        env:
+        - name: REGION_NAME
+          value: regionA
 ---
 apiVersion: v1
 kind: Service
@@ -226,6 +229,9 @@ spec:
         image: crazk8sregiona3puht23u7vmqg.azurecr.io/myapp:v1
         ports:
         - containerPort: 8080
+        env:
+        - name: REGION_NAME
+          value: regionB
 ---
 apiVersion: v1
 kind: Service
