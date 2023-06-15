@@ -294,7 +294,3 @@ In this section we are going to focus on creating an Azure FrontDoor which conne
 ![Screenshot](azfd7.jpg)
 
 10) Access Azure Front Door's endpoint and you should now be able to access the web application through your browser.
-
-```bash 
-az aks command invoke   --resource-group az-k8s-regionB-rg   --name aks-az-k8s-regionB   --command "kubectl run app --image crazk8sregionalpu27lwe7jpr2.azurecr.io/myapp:v1"
-```
