@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Latency Test</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <div id="response">
-    This app is running in {{ response.region }}. 
-    </div>
-    <script>
-        var start_time = performance.now();
-        console.log("starting measurement")
-        $.get('/index.html').done(function(data) {
-            var end_time = performance.now();
-            var latency_ms = end_time - start_time;
-            console.log("latency", latency_ms)
-            $('#response').append(' Client latency: ' + latency_ms.toFixed(2) + ' ms');
-        });
-    </script>
-</body>
+    <head>
+        <title>Latency Test</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <div id="response">
+            <p>This app is running in {{ response.region }}.</p>
+        </div>
+        <script>
+            var start_time = performance.now();
+            console.log("starting measurement")
+            $.get('/index.html').done(function(data) {
+                var end_time = performance.now();
+                var latency_ms = end_time - start_time;
+                console.log("latency", latency_ms)
+                $('#response').append('<p>Client latency: ' + latency_ms.toFixed(2) + ' ms</p>');
+            });
+        </script>
+    </body>
 </html>
